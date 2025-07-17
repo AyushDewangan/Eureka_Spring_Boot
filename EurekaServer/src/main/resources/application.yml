@@ -1,0 +1,13 @@
+server:
+  port: 8761
+
+
+# Eureka Server it self has eureka client properties thats why need to disable its client properties, So thet
+#it should not register it self.
+
+eureka:
+  client:
+#		Here it no need to fetch the fetch it self as the client because it is server not a client
+    fetch-registry: false
+#		Eureka is the server, not a client, there's no need to register itself anywhere.
+    register-with-eureka: false
