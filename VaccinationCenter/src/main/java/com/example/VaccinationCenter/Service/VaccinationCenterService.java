@@ -10,6 +10,9 @@ import com.example.VaccinationCenter.Entity.VaccinationCenter;
 import com.example.VaccinationCenter.Repository.VaccinationCenterRepository;
 import com.example.VaccinationCenter.Response.Citizen;
 import com.example.VaccinationCenter.Response.VaccinationCenterVM;
+//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @Service
 public class VaccinationCenterService {
@@ -24,6 +27,8 @@ public class VaccinationCenterService {
 		return vaccinationCenterRepository.save(entity);
 	}
 
+//	@HystrixCommand(fallbackMethod = "handleCitizenDownTime")
+	@CircuitBreaker(name = "vaccinationCenter", fallbackMethod = "handleCitizenDownTime")
 	public VaccinationCenterVM fetchVaccinationCenterService(int id) {
 		VaccinationCenterVM centerVM = new VaccinationCenterVM();
 		VaccinationCenter vaccinationCenter = vaccinationCenterRepository.findById(id).get();
@@ -37,5 +42,11 @@ public class VaccinationCenterService {
 		centerVM.setCitizenList(citizenList);
 		return centerVM;
 	}
-
+	
+	public VaccinationCenterVM handleCitizenDownTime(int id, Throwable t) {
+		VaccinationCenterVM centerVM = new VaccinationCenterVM();
+		VaccinationCenter vaccinationCenter = vaccinationCenterRepository.findById(id).get();
+		centerVM.setVaccinationCenter(vaccinationCenter);
+		return centerVM;
+	}
 }
